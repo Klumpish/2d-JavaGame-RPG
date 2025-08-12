@@ -9,11 +9,14 @@ public class GamePanel extends JPanel implements Runnable {
     // the spirits
     final int scale = 3;
 
-    final int titleSize = originalTileSize * scale; // 48x48 tile
+    final int tileSize = originalTileSize * scale; // 48x48 tile
     final int maxScreenCol = 16; // horizontally
     final int maxScreenRow = 12; // vertically
-    final int screenWidth = titleSize * maxScreenCol;  // 768px
-    final int screenHeight = titleSize * maxScreenRow; //
+    final int screenWidth = tileSize * maxScreenCol;  // 768px
+    final int screenHeight = tileSize * maxScreenRow; //
+
+    //FPS
+    int FPS = 60;
 
     KeyHandler keyH = new KeyHandler();
     Thread gameThread;
@@ -44,22 +47,41 @@ public class GamePanel extends JPanel implements Runnable {
     @Override
     public void run() {
         //game loop
+
+        double drawInterval = 1_000_000_000 / FPS; // 0.01666 seconds
+        double nextDrawTime = System.nanoTime() + drawInterval;
         while (gameThread != null) {
+
             //1. update: update info such as Char positions
             update();
             //2. Draw: draw the screen with the updated info
             repaint();
+            try {
+                double remainingTime = nextDrawTime - System.nanoTime();
+                remainingTime = remainingTime / 1_000_000;
+                if (remainingTime < 0) {
+                    remainingTime = 0;
+                }
+                Thread.sleep((long) remainingTime);
+
+                nextDrawTime += drawInterval;
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 
     public void update() {
         if (keyH.upPressed == true) {
             playerY -= playerSpeed;
-        } else if (keyH.downPressed == true) {
+        }
+        if (keyH.downPressed == true) {
             playerY += playerSpeed;
-        } else if (keyH.leftPressed == true) {
+        }
+        if (keyH.leftPressed == true) {
             playerX -= playerSpeed;
-        } else if (keyH.rightPressed == true) {
+        }
+        if (keyH.rightPressed == true) {
             playerX += playerSpeed;
         }
     }
@@ -69,7 +91,7 @@ public class GamePanel extends JPanel implements Runnable {
         Graphics2D g2 = (Graphics2D) g;
 
         g2.setColor(Color.white);
-        g2.fillRect(playerX, playerY, titleSize, titleSize);
+        g2.fillRect(playerX, playerY, tileSize, tileSize);
 
         //we use dispose so that after its done it wont take up system resources
         g2.dispose();
