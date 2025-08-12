@@ -3,7 +3,7 @@ package main;
 import javax.swing.*;
 import java.awt.*;
 
-public class GamePanel extends JPanel {
+public class GamePanel extends JPanel implements Runnable {
     //    screen settings
     final int originalTileSize = 16; //16x16 tile the amount of pixels for
     // the spirits
@@ -13,7 +13,10 @@ public class GamePanel extends JPanel {
     final int maxScreenCol = 16; // horizontally
     final int maxScreenRow = 12; // vertically
     final int screenWidth = titleSize * maxScreenCol;  // 768px
-    final int screenHeight = titleSize * maxScreenRow; // 576px
+    final int screenHeight = titleSize * maxScreenRow; //
+
+    Thread gameThread;
+
 
     //    constructor
     public GamePanel() {
@@ -22,5 +25,37 @@ public class GamePanel extends JPanel {
 //        if set to true all drawing from this component will be done in an
 //        offscreen painting buffer, it improves game's rending performance
         this.setDoubleBuffered(true);
+    }
+
+    public void startGameThread() {
+        //init our thread
+        gameThread = new Thread(this);
+        gameThread.start();
+    }
+
+    @Override
+    public void run() {
+        //game loop
+        while (gameThread != null) {
+            //1. update: update info such as Char positions
+            update();
+            //2. Draw: draw the screen with the updated info
+            repaint();
+        }
+    }
+
+    public void update() {
+
+    }
+
+    public void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        Graphics2D g2 = (Graphics2D) g;
+
+        g2.setColor(Color.white);
+        g2.fillRect(100, 100, titleSize, titleSize);
+
+        //we use dispose so that after its done it wont take up system resources
+        g2.dispose();
     }
 }

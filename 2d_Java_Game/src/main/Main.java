@@ -14,8 +14,14 @@ public class Main {
         GamePanel gamePanel = new GamePanel();
         window.add(gamePanel);
 
+        //Pack causes this window to be sized to fit the preferred size and
+        // layout of its subcomponents (GamePanel)
+        window.pack();
+
         window.setLocationRelativeTo(null);
         window.setVisible(true);
+
+        gamePanel.startGameThread();
     }
 
 }
